@@ -9,7 +9,7 @@ Modified @ Farzain - zFz
 require_once('./line_class.php');
 require_once('./unirest-php-master/src/Unirest.php');
 
-$channelAccessToken = 'g3ZExDFXjjkHdjSxTLf53okytIOa+kEsjOA8A0LYuhfjQc50FfnFypEavlE0mSbkzdyT44k84Cvf8EzX0Vj2Y/waYMFxZxXg6gzIWEPFa2PVJzuCkRol0GJDaD99E5NQMXyCA3J0aisIXnVcyM3GXAdB04t89/1O/w1cDnyilFU='; //sesuaikan 
+$channelAccessToken = 'CDCnoOFOwTX/hCGZGpYwbNJ29sUEeSoc9470kK6uxaI2mwtX/rrgJqzyR146dTjizdyT44k84Cvf8EzX0Vj2Y/waYMFxZxXg6gzIWEPFa2PuCRw5HBZrr7c8NflagqxVFEufMhUIE1nI2Of/rCUpYwdB04t89/1O/w1cDnyilFU='; //sesuaikan 
 $channelSecret = 'ce4a2e674e85a8c29cfa5a6784d75c98';//sesuaikan
 
 $client = new LINEBotTiny($channelAccessToken, $channelSecret);
@@ -52,6 +52,26 @@ function cuaca($keyword) {
 	$result .= $json['weather']['0']['description'];
     return $result;
 }
+function shalat($keyword) {
+    $uri = "https://time.siswadi.com/pray/" . $keyword;
+    $response = Unirest\Request::get("$uri");
+    $json = json_decode($response->raw_body, true);
+    $result = "Jadwal Shalat Sekitar ";
+	$result .= $json['location']['address'];
+	$result .= "\nTanggal : ";
+	$result .= $json['time']['date'];
+	$result .= "\n\nShubuh : ";
+	$result .= $json['data']['Fajr'];
+	$result .= "\nDzuhur : ";
+	$result .= $json['data']['Dhuhr'];
+	$result .= "\nAshar : ";
+	$result .= $json['data']['Asr'];
+	$result .= "\nMaghrib : ";
+	$result .= $json['data']['Maghrib'];
+	$result .= "\nIsya : ";
+	$result .= $json['data']['Isha'];
+    return $result;
+}
 #-------------------------[Function]-------------------------#
 
 # require_once('./src/function/search-1.php');
@@ -62,7 +82,7 @@ function cuaca($keyword) {
 
 //show menu, saat join dan command /menu
 if ($type == 'join' || $command == '/menu') {
-    $text = "Halo Kak ^_^\nAku Bot Prediksi Cuaca, Kamu bisa mengetahui prediksi cuaca di daerah kamu sesuai dengan sumber BMKG";
+    $text = "Halo Kak ^_^\nAku Bot Prediksi Cuaca, Kamu bisa mengetahui prediksi cuaca dan jadwal sholat di daerah kamu sesuai dengan sumber BMKG";
     $balas = array(
         'replyToken' => $replyToken,
         'messages' => array(
@@ -89,7 +109,20 @@ if($message['type']=='text') {
             )
         );
     }
-
+if($message['type']=='text') {
+	    if ($command == '/shalat') {
+        $result = shalat($options);
+        $balas = array(
+            'replyToken' => $replyToken,
+            'messages' => array(
+                array(
+                    'type' => 'text',
+                    'text' => $result
+                )
+            )
+        );
+    }
+	
 }else if($message['type']=='sticker')
 {	
 	$balas = array(
